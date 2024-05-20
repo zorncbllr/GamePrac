@@ -199,7 +199,7 @@ public class Terry extends  Fighter{
 
         tracker++;
         if (tracker==45){
-            fireballList.push(new Fireball(this, panel, y - fireball[5][3]));
+            fireballList.push(new Fireball(this, panel, y - fireball[5][3]*2));
         }
         if (p>=10) tracker = 0;
     }
