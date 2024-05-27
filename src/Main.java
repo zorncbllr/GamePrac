@@ -1,7 +1,6 @@
 import Components.Frame;
+import javax.swing.*;
 
-public class Main {
-    public static void main(String[] args) {
-        new Frame();
-    }
+void main(){
+        SwingUtilities.invokeLater(Frame::new);
 }

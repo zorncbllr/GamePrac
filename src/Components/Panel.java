@@ -45,7 +45,7 @@ public class Panel extends JPanel {
             ftr.handleFireBall(g2d);
         }
 
-//
-//        inputHandler2.handleComputerMove();
+       // inputHandler1.handleComputerMove();
+        inputHandler2.handleComputerMove();
     }
 }

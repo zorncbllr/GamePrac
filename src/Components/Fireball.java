@@ -23,7 +23,6 @@ public class Fireball {
         if (fighter.hitting() || Math.abs(fighter.x - distance)>panel.getWidth()){
             fighter.hitBox.setBounds(0,0,0,0);
             fighter.fireballList.remove(this);
-            this.distance = fighter.x;
         }
         tick++;
         if (tick>=1000/ Constant.FPS){

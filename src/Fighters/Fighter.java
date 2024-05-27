@@ -15,7 +15,7 @@ abstract public class Fighter {
     public float scale;
     public int x, y = 520, vx = Constant.vx, camera, tracker, fighterX, fighterY, code = 0, activeIndex, width, height ,direction;
     public Queue<Integer> comboAttack;
-    public boolean isJumping = false, punching = false, kicking = false, attacking = false, hurt = false;
+    public boolean isJumping = false, punching = false, kicking = false, attacking = false, hurting = false;
     public Fighter enemy;
     public Rectangle pushBox, hitBox;
     public BufferedImage fighter;
@@ -104,20 +104,18 @@ abstract public class Fighter {
         draw(g2d, frames, p);
     }
     public void hurt(Graphics2D g2d){
-        hurt = true;
         tick++;
-        int[][][] frames = enemy.kicking? hurt2: hurt1;
-        if (tick >= 1000/ Constant.FPS){
+        if (tick >= 1000/Constant.FPS){
             tick = 0;
             h++;
         }
-        if (h >= (frames.length)){
+        int[][][] frame = enemy.kicking? hurt2: hurt1;
+        if(h >= frame.length){
+            hurting = false;
             h = 0;
             code = 0;
-            hurt = false;
-            return;
         }
-        draw(g2d, frames, h);
+        draw(g2d, frame, h);
     }
     public void jumpForward(Graphics2D g2d){
         jump(g2d, jumpForward);
@@ -156,7 +154,6 @@ abstract public class Fighter {
         this.width = (int) (frame[index][0][2] * (scale * direction));
         this.height = (int) (frame[index][0][3] * scale);
         int groundGap = (int) (frame[index][0][4] * Constant.GROUNDGAP);
-
          this.fighterX = camera + (x-width/2);
          this.fighterY = y-(height+groundGap);
 
@@ -170,7 +167,7 @@ abstract public class Fighter {
         setPushBox(g2d, index, frame);
         drawDimension(g2d, frame, index);
 
-            if (attacking && !hurt) setHitBox(g2d, index, frame);
+            if (attacking) setHitBox(g2d, index, frame);
 
     }
 
@@ -194,7 +191,7 @@ abstract public class Fighter {
         }
 
         g2d.setColor(Color.magenta);
-       // g2d.drawRect(x_box, fighterY, box_width, box_height);
+       g2d.drawRect(x_box, fighterY, box_width, box_height);
     }
 
 
@@ -211,7 +208,7 @@ abstract public class Fighter {
         int box_height = (int) (frame[index][1][3] * scale);
 
         pushBox.setBounds(x_box, y_box, box_width, box_height);
-      //  drawDebug(g2d, x_box, y_box, box_width, box_height);
+        drawDebug(g2d, x_box, y_box, box_width, box_height);
     }
     public void setHitBox(Graphics2D g2d, int index, int[][][] frame){
         int groundGap = (int) (frame[index][0][4] * Constant.GROUNDGAP);
@@ -222,7 +219,7 @@ abstract public class Fighter {
         int box_height = (int) (frame[index][2][3] * scale);
 
         hitBox.setBounds(x_box, y_box, box_width, box_height);
-       // drawDebugHit(g2d,x_box, y_box, box_width, box_height);
+        drawDebugHit(g2d,x_box, y_box, box_width, box_height);
     }
 
     public boolean colliding(){
@@ -234,8 +231,9 @@ abstract public class Fighter {
     }
     public boolean hurting(){
         if (enemy.hitBox.intersects(pushBox)){
-            i = 0; j = 0; p = 0;
-            hurt = true;
+            i = 0; j = 0; p = 0; h = 0;
+            x -= direction * 5;
+            hurting = true;
             return true;
         }
         return false;
@@ -243,57 +241,11 @@ abstract public class Fighter {
 
     public boolean hitting(){
         if (hitBox.intersects(enemy.pushBox)){
-            enemy.x += activeFrame==lightKick || activeFrame==jab?
-                    direction * 2: direction * 50;
-
-            enemy.code = 404;
             return  true;
         }
         return  false;
     }
-    public void handleAnimation(Graphics2D g2d){
-        this.direction = x >= enemy.x? -1: 1;
 
-        switch (code) {
-            case 87 -> jump(g2d);
-            case 83 -> crouch(g2d);
-            case 68 -> {
-                if (direction > 0) walkForward(g2d);
-                else walkBackward(g2d);
-                if(!colliding()) x += vx;
-            }
-            case 65 -> {
-                if (direction > 0) walkBackward(g2d);
-                else walkForward(g2d);
-                if(!colliding()) x -= vx;
-            }
-            case 200 -> {
-                if (direction > 0) jumpBackward(g2d);
-                else jumpForward(g2d);
-                if(!colliding()) x -= (int) (vx + 1.7);
-            }
-            case 300 -> {
-                if (direction > 0) jumpForward(g2d);
-                else jumpBackward(g2d);
-                if(!colliding()) x += (int) (vx + 1.7);
-            }
-            case 404 -> {
-                hurt = true;
-                hurt(g2d);
-            }
-            case 53 ->{
-                jab(g2d);
-            }
-            case 54 -> punch(g2d);
-            case 84 -> {
-                lightKick(g2d);
-            }
-            case 89 -> {
-                heavyKick(g2d);
-            }
-            default -> idle(g2d);
-        }
-    }
     public Stack<Fireball> fireballList = new Stack<>();
     public void handleFireBall(Graphics2D g2d){
         try {
@@ -318,17 +270,61 @@ abstract public class Fighter {
 
                 hitBox.setBounds(fireX, fireY, firewidth, fireheight);
 
-             //   drawDebugHit(g2d, fireX, fireY, firewidth, fireheight);
+                drawDebugHit(g2d, fireX, fireY, firewidth, fireheight);
                 fire.update();
             });
-        } catch (Exception ignored) {}
+        } catch (Exception _) {}
     }
+
+    public void handleAnimation(Graphics2D g2d){
+
+        switch (code) {
+            case 87 -> jump(g2d);
+            case 83 -> crouch(g2d);
+            case 68 -> {
+                if (direction > 0) walkForward(g2d);
+                else walkBackward(g2d);
+                if(!colliding()) x += vx;
+            }
+            case 65 -> {
+                if (direction > 0) walkBackward(g2d);
+                else walkForward(g2d);
+                if(!colliding()) x -= vx;
+            }
+            case 200 -> {
+                if (direction > 0) jumpBackward(g2d);
+                else jumpForward(g2d);
+                if(!colliding()) x -= (int) (vx + 1.7);
+            }
+            case 300 -> {
+                if (direction > 0) jumpForward(g2d);
+                else jumpBackward(g2d);
+                if(!colliding()) x += (int) (vx + 1.7);
+            }
+            case 53 ->{
+                jab(g2d);
+            }
+            case 54 -> punch(g2d);
+            case 84 -> {
+                lightKick(g2d);
+            }
+            case 89 -> {
+                heavyKick(g2d);
+            }
+            default -> idle(g2d);
+        }
+    }
+
     public void update(Graphics2D g2d) {
         if(code!=83) d = 0;
-        if(kicking || punching) attacking = true;
-        if (hurting()) hitBox.setBounds(0,0,0,0);
+        this.direction = x >= enemy.x? -1: 1;
         colliding();
-        hitting();
+        if (hurting()) hurting = true;
+        if (hurting){
+            hurt(g2d);
+            return;
+        }
+        if(kicking || punching) attacking = true;
 
         for (int com = 0; com < Constant.FIGHTER_COMBO.size(); com++){
             if (Constant.FIGHTER_COMBO.get(com).equals(comboAttack)){

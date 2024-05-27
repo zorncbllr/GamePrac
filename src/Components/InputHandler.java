@@ -15,23 +15,23 @@ public class InputHandler {
         switch (input) {
             // fighter 1 controls
             case 87 -> {
-                if (!fighter.attacking && !fighter.hurt){
+                if (!fighter.attacking){
                     fighter.isJumping = true;
                     fighter.code = 87;
                 }
             }
             case 83 -> {
-                if (!fighter.isJumping && !fighter.attacking && !fighter.hurt) fighter.code = 83;
+                if (!fighter.isJumping && !fighter.attacking ) fighter.code = 83;
             }
             case 68 -> {
-                if(!fighter.attacking && !fighter.hurt){
+                if(!fighter.attacking ){
                     if (fighter.isJumping) {
                         fighter.code = 300;
                     } else fighter.code = 68;
                 }
             }
             case 65 -> {
-                if(!fighter.attacking && !fighter.hurt){
+                if(!fighter.attacking ){
                     if (fighter.isJumping) {
                         fighter.code = 200;
                     }
@@ -39,25 +39,25 @@ public class InputHandler {
                 }
             }
             case 53 -> {
-                if (!fighter.isJumping && !fighter.attacking && !fighter.hurt){
+                if (!fighter.isJumping && !fighter.attacking ){
                     fighter.punching = true;
                     fighter.code = 53;
                 }
             }
             case 54 -> {
-                if(!fighter.isJumping && !fighter.attacking && !fighter.hurt){
+                if(!fighter.isJumping && !fighter.attacking ){
                     fighter.punching = true;
                     fighter.code = 54;
                 }
             }
             case 84 -> {
-                if(!fighter.isJumping && !fighter.attacking && !fighter.hurt) {
+                if(!fighter.isJumping && !fighter.attacking ) {
                     fighter.kicking = true;
                     fighter.code = 84;
                 }
             }
             case 89 -> {
-                if(!fighter.isJumping && !fighter.attacking && !fighter.hurt) {
+                if(!fighter.isJumping && !fighter.attacking ) {
                     fighter.kicking = true;
                     fighter.code = 89;
                 }
@@ -78,9 +78,7 @@ public class InputHandler {
             int walk = fighter.direction>0? 68: 65;
             computerMove = distance >= 180? walk: computerMove;
 
-            if (!fighter.hurt)  {
-                this.handleInputs(computerMove);
-            }
+            handleInputs(computerMove);
         }
     }
 }

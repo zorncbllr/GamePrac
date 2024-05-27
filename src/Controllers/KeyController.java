@@ -35,6 +35,33 @@ public class KeyController extends KeyAdapter{
         }
 
         inputHandler.handleInputs(keyCode);
+//
+//        switch (keyCode) {
+//            case 38 -> {
+//                if (!fighter.get(1).attacking){
+//                    fighter.get(1).isJumping = true;
+//                    fighter.get(1).code = 87;
+//                }
+//            }
+//            case 40 -> {
+//                if (!fighter.get(1).isJumping && !fighter.get(1).attacking) fighter.get(1).code = 83;
+//            }
+//            case 39 -> {
+//                if(!fighter.get(1).attacking){
+//                    if (fighter.get(1).isJumping) {
+//                        fighter.get(1).code = 300;
+//                    } else fighter.get(1).code = 68;
+//                }
+//            }
+//            case 37 -> {
+//                if(!fighter.get(1).attacking){
+//                    if (fighter.get(1).isJumping) {
+//                        fighter.get(1).code = 200;
+//                    }
+//                    else fighter.get(1).code = 65;
+//                }
+//            }
+//        }
 
     }
 
@@ -45,7 +72,7 @@ public class KeyController extends KeyAdapter{
 
         for (int i=0; i< 2; i++){
             if (FIGHTERCONTROLS.get(i).contains(keyCode)){
-                if(!fighter.get(i).isJumping && !fighter.get(i).attacking && !fighter.get(0).hurt)
+                if(!fighter.get(i).isJumping && !fighter.get(i).attacking)
                     fighter.get(i).code = 0;
             }
         }

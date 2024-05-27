@@ -50,21 +50,15 @@ public class Backdrop {
 
     int prevX = 0;
     public void handleCamera(Graphics2D g2d){
-            for (Fighter ftr: fighters){
-                ftr.camera = panel.getWidth() - Math.abs(backdropX);
-            }
-
-            int dif = Math.abs(fighters[0].x - prevX);
-
-        if (!(Math.abs(backdropX) >= (width)-panel.getWidth() || backdropX >= 0)){
-            if (dif > 0){
-                backdropX -= (fighters[0].x - prevX)/2;
-                prevX = fighters[0].x;
-            }
+        for (Fighter ftr: fighters){
+            ftr.camera = panel.getWidth() - Math.abs(backdropX);
         }
-        else {
-            System.out.println("ajsgj");
-            backdropX += fighters[0].width;
+
+        int dif = Math.abs(fighters[0].x - prevX);
+
+        if (dif > 0){
+            backdropX -= (fighters[0].x - prevX);
+            prevX = fighters[0].x;
         }
     }
 }
