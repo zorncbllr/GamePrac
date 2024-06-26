@@ -15,6 +15,7 @@ public class Backdrop {
     private Fighter[] fighters;
     int backdropX, tick = 0, imageX = 14, imageY = 1, vx = 10, height, width;
     public BufferedImage backdrop;
+
     public Backdrop(String path, Panel panel){
         this.panel = panel;
         this.fighters = panel.fighter;
@@ -27,14 +28,16 @@ public class Backdrop {
         }
         this.backdropX = -752;
     }
+
     public void drawBackdrop(Graphics2D g2d){
         tick++;
         if (tick>=1000/ Constant.FPS){
             tick = 0;
             imageY += 245 + 4;
-            handleCamera(g2d);
         }
         if (imageY >= 1993) imageY = 1;
+
+        handleCamera(g2d);
 
         height =  (int) (245 * scale);
         width =  (int) (752 * scale);
@@ -49,6 +52,7 @@ public class Backdrop {
     }
 
     int prevX = 0;
+
     public void handleCamera(Graphics2D g2d){
         for (Fighter ftr: fighters){
             ftr.camera = panel.getWidth() - Math.abs(backdropX);
