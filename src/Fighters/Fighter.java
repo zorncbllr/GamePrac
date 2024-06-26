@@ -12,10 +12,25 @@ import java.io.*;
 import java.util.*;
 
 abstract public class Fighter {
+   public enum STATE {
+       IDLE,
+       WALK_FORWARD,
+       WALK_BACKWARD,
+       JUMP,
+       CROUCH,
+       JUMP_FORWARD,
+       JUMP_BACKWARD,
+       PUNCH_A,
+       PUNCH_B,
+       KICK_A,
+       KICK_B,
+       HURT
+   }
+   public STATE state = STATE.IDLE;
     public float scale;
-    public int x, y = 520, vx = Constant.vx, camera, tracker, fighterX, fighterY, code = 0, activeIndex, width, height ,direction;
+    public int x, y = 520, vx = Constant.vx, camera, tracker, fighterX, fighterY, activeIndex, width, height ,direction;
     public Queue<Integer> comboAttack;
-    public boolean isJumping = false, punching = false, kicking = false, attacking = false, hurting = false;
+    public boolean isJumping = false, attacking = false;
     public Fighter enemy;
     public Rectangle pushBox, hitBox;
     public BufferedImage fighter;
@@ -97,9 +112,7 @@ abstract public class Fighter {
         if (p >= frames.length){
             p = 0;
             attacking = false;
-            if(punching) punching = false;
-            if(kicking) kicking = false;
-            code = 0;
+            state = STATE.IDLE;
         }
         draw(g2d, frames, p);
     }
@@ -109,11 +122,11 @@ abstract public class Fighter {
             tick = 0;
             h++;
         }
-        int[][][] frame = enemy.kicking? hurt2: hurt1;
+        boolean enemy_kicking = enemy.state == STATE.KICK_A || enemy.state == STATE.KICK_B;
+        int[][][] frame = enemy_kicking ? hurt2: hurt1;
         if(h >= frame.length){
-            hurting = false;
             h = 0;
-            code = 0;
+            state = STATE.IDLE;
         }
         draw(g2d, frame, h);
     }
@@ -135,7 +148,7 @@ abstract public class Fighter {
         if(j >= frame.length){
             isJumping = false;
             j = 0;
-            code = 0;
+            state = STATE.IDLE;
         }
         draw(g2d, frame, j);
     }
@@ -184,10 +197,10 @@ abstract public class Fighter {
         int box_height = (int) (frame[index][0][3] * scale);
 
         if (((camera + x) + (box_width/2)) >= panel.getWidth()){
-            x -= code==300 || code==200? (int) (vx + 1.7) : vx;
+            x -= state==STATE.JUMP_FORWARD || state==STATE.JUMP_BACKWARD? (int) (vx + 1.7) : vx;
         }
         if (((camera + x) - (box_width/2)) <= 0){
-            x += code==300 || code==200? (int) (vx + 1.7) : vx;
+            x += state==STATE.JUMP_FORWARD || state==STATE.JUMP_BACKWARD? (int) (vx + 1.7) : vx;
         }
 
         g2d.setColor(Color.magenta);
@@ -232,8 +245,9 @@ abstract public class Fighter {
     public boolean hurting(){
         if (enemy.hitBox.intersects(pushBox)){
             i = 0; j = 0; p = 0; h = 0;
-            x -= direction * 5;
-            hurting = true;
+
+            boolean heavy_attack = state==STATE.PUNCH_B || state==STATE.KICK_B;
+            x -= direction * (heavy_attack? 60: 30);
             return true;
         }
         return false;
@@ -241,6 +255,7 @@ abstract public class Fighter {
 
     public boolean hitting(){
         if (hitBox.intersects(enemy.pushBox)){
+            enemy.state = STATE.HURT;
             return  true;
         }
         return  false;
@@ -277,54 +292,61 @@ abstract public class Fighter {
     }
 
     public void handleAnimation(Graphics2D g2d){
-
-        switch (code) {
-            case 87 -> jump(g2d);
-            case 83 -> crouch(g2d);
-            case 68 -> {
+  //      if (this instanceof Terry) System.out.println(state);
+        switch (state) {
+            case JUMP -> jump(g2d);
+            case CROUCH -> crouch(g2d);
+            case WALK_FORWARD -> {
                 if (direction > 0) walkForward(g2d);
                 else walkBackward(g2d);
-                if(!colliding()) x += vx;
+                if (!colliding()) x += vx;
             }
-            case 65 -> {
+            case WALK_BACKWARD -> {
                 if (direction > 0) walkBackward(g2d);
                 else walkForward(g2d);
-                if(!colliding()) x -= vx;
+                if (!colliding()) x -= vx;
             }
-            case 200 -> {
+            case JUMP_BACKWARD -> {
                 if (direction > 0) jumpBackward(g2d);
                 else jumpForward(g2d);
-                if(!colliding()) x -= (int) (vx + 1.7);
+                if (!colliding()) x -= (int) (vx + 1.7);
             }
-            case 300 -> {
+            case JUMP_FORWARD -> {
                 if (direction > 0) jumpForward(g2d);
                 else jumpBackward(g2d);
-                if(!colliding()) x += (int) (vx + 1.7);
+                if (!colliding()) x += (int) (vx + 1.7);
             }
-            case 53 ->{
+            case PUNCH_A -> {
+                attacking = true;
                 jab(g2d);
             }
-            case 54 -> punch(g2d);
-            case 84 -> {
+            case PUNCH_B ->{
+                attacking = true;
+                punch(g2d);
+            }
+            case KICK_A -> {
+                attacking = true;
                 lightKick(g2d);
             }
-            case 89 -> {
+            case KICK_B -> {
+                attacking = true;
                 heavyKick(g2d);
+            }
+            case HURT ->{
+                hurt(g2d);
+                attacking = false;
+                isJumping = false;
             }
             default -> idle(g2d);
         }
     }
 
     public void update(Graphics2D g2d) {
-        if(code!=83) d = 0;
+        if(state!=STATE.CROUCH) d = 0;
         this.direction = x >= enemy.x? -1: 1;
         colliding();
-        if (hurting()) hurting = true;
-        if (hurting){
-            hurt(g2d);
-            return;
-        }
-        if(kicking || punching) attacking = true;
+
+        if (hurting()) state = STATE.HURT;
 
         for (int com = 0; com < Constant.FIGHTER_COMBO.size(); com++){
             if (Constant.FIGHTER_COMBO.get(com).equals(comboAttack)){

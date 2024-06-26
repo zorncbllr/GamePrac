@@ -1,6 +1,8 @@
 package Components;
 
 import Fighters.Fighter;
+import Fighters.K;
+import Fighters.Terry;
 import utils.Constant;
 
 import java.util.Random;
@@ -11,55 +13,54 @@ public class InputHandler {
         this.fighter = fighter;
     }
     public void handleInputs(int input){
-
+        if (fighter.state== Fighter.STATE.HURT) return;
         switch (input) {
-            // fighter 1 controls
             case 87 -> {
                 if (!fighter.attacking){
                     fighter.isJumping = true;
-                    fighter.code = 87;
+                    fighter.state = Fighter.STATE.JUMP;
                 }
             }
             case 83 -> {
-                if (!fighter.isJumping && !fighter.attacking ) fighter.code = 83;
+                if (!fighter.isJumping && !fighter.attacking ) fighter.state = Fighter.STATE.CROUCH;
             }
             case 68 -> {
                 if(!fighter.attacking ){
                     if (fighter.isJumping) {
-                        fighter.code = 300;
-                    } else fighter.code = 68;
+                        fighter.state = Fighter.STATE.JUMP_FORWARD;
+                    } else fighter.state = Fighter.STATE.WALK_FORWARD;
                 }
             }
             case 65 -> {
                 if(!fighter.attacking ){
                     if (fighter.isJumping) {
-                        fighter.code = 200;
+                        fighter.state = Fighter.STATE.JUMP_BACKWARD;
                     }
-                    else fighter.code = 65;
+                    else fighter.state = Fighter.STATE.WALK_BACKWARD;
                 }
             }
             case 53 -> {
                 if (!fighter.isJumping && !fighter.attacking ){
-                    fighter.punching = true;
-                    fighter.code = 53;
+                    fighter.attacking = true;
+                    fighter.state = Fighter.STATE.PUNCH_A;
                 }
             }
             case 54 -> {
                 if(!fighter.isJumping && !fighter.attacking ){
-                    fighter.punching = true;
-                    fighter.code = 54;
+                    fighter.attacking = true;
+                    fighter.state = Fighter.STATE.PUNCH_B;
                 }
             }
             case 84 -> {
                 if(!fighter.isJumping && !fighter.attacking ) {
-                    fighter.kicking = true;
-                    fighter.code = 84;
+                    fighter.attacking = true;
+                    fighter.state = Fighter.STATE.KICK_A;
                 }
             }
             case 89 -> {
                 if(!fighter.isJumping && !fighter.attacking ) {
-                    fighter.kicking = true;
-                    fighter.code = 89;
+                    fighter.attacking = true;
+                    fighter.state = Fighter.STATE.KICK_B;
                 }
             }
         }
