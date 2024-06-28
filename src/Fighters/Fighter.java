@@ -167,7 +167,7 @@ abstract public class Fighter {
         this.width = (int) (frame[index][0][2] * (scale * direction));
         this.height = (int) (frame[index][0][3] * scale);
         int groundGap = (int) (frame[index][0][4] * Constant.GROUNDGAP);
-         this.fighterX = camera + (x-width/2);
+         this.fighterX = (int) (camera/2.5) + (x-width/2);
          this.fighterY = y-(height+groundGap);
 
         g2d.drawImage(fighter.getSubimage(
@@ -181,7 +181,6 @@ abstract public class Fighter {
         drawDimension(g2d, frame, index);
 
             if (attacking) setHitBox(g2d, index, frame);
-
     }
 
     public void drawDebug(Graphics2D g2d, int x_box, int y_box, int box_width, int box_height){
@@ -196,10 +195,10 @@ abstract public class Fighter {
         int box_width = (int) (frame[index][0][2] * scale);
         int box_height = (int) (frame[index][0][3] * scale);
 
-        if (((camera + x) + (box_width/2)) >= panel.getWidth()){
+        if ((((int) (camera/2.5) + x) + (box_width/2)) >= panel.getWidth()){
             x -= state==STATE.JUMP_FORWARD || state==STATE.JUMP_BACKWARD? (int) (vx + 1.7) : vx;
         }
-        if (((camera + x) - (box_width/2)) <= 0){
+        if ((((int) (camera/2.5) + x) - (box_width/2)) <= 0){
             x += state==STATE.JUMP_FORWARD || state==STATE.JUMP_BACKWARD? (int) (vx + 1.7) : vx;
         }
 
@@ -214,7 +213,7 @@ abstract public class Fighter {
     }
     public void setPushBox(Graphics2D g2d, int index, int[][][] frame){
         int groundGap = (int) (frame[index][0][4] * Constant.GROUNDGAP);
-        int x_box = camera + (int) (direction>0? x-frame[index][1][0] * scale :
+        int x_box = (int) (camera/2.5) + (int) (direction>0? x-frame[index][1][0] * scale :
                         x-((frame[index][1][2] * scale) - (frame[index][1][0] * scale)));
         int y_box = (int) (y-(frame[index][1][1] * scale + groundGap));
         int box_width = (int) (frame[index][1][2] * scale);
@@ -225,7 +224,7 @@ abstract public class Fighter {
     }
     public void setHitBox(Graphics2D g2d, int index, int[][][] frame){
         int groundGap = (int) (frame[index][0][4] * Constant.GROUNDGAP);
-        int x_box = camera + (int) (direction>0? x-frame[index][2][0] * scale :
+        int x_box = (int) (camera/2.5) + (int) (direction>0? x-frame[index][2][0] * scale :
                         x-((frame[index][2][2]*scale) - (frame[index][2][0]*scale)));
         int y_box = (int) (y-(frame[index][2][1] * scale + groundGap));
         int box_width = (int) (frame[index][2][2] * scale);
