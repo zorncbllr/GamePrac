@@ -16,8 +16,8 @@ public class Panel extends JPanel {
     public Graphics2D g2d;
     Panel(){
         this.fighter = new Fighter[] {
-                new Terry(this, 100),
-                new K(this, 900)
+                new Terry(this, 200),
+                new K(this, 800)
         };
         inputHandler2 = new InputHandler(fighter[1]);
         inputHandler1 = new InputHandler(fighter[0]);
@@ -45,7 +45,7 @@ public class Panel extends JPanel {
             ftr.handleFireBall(g2d);
         }
 
-       // inputHandler1.handleComputerMove();
-        inputHandler2.handleComputerMove();
+      //  inputHandler1.handleComputerMove();
+      //  inputHandler2.handleComputerMove();
     }
 }

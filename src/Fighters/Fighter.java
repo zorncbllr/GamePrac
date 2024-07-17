@@ -28,7 +28,7 @@ abstract public class Fighter {
    }
    public STATE state = STATE.IDLE;
     public float scale;
-    public int x, y = 520, vx = Constant.vx, camera, tracker, fighterX, fighterY, activeIndex, width, height ,direction;
+    public int x, y = 520, vx = Constant.vx, camera, tracker, offset_x, offset_y, fighterX, activeIndex, width, height ,direction;
     public Queue<Integer> comboAttack;
     public boolean isJumping = false, attacking = false;
     public Fighter enemy;
@@ -43,6 +43,7 @@ abstract public class Fighter {
     public int[][][] walkingForward, walkingBackward, idle, crouch, jump, jumpForward, jumpBackward,
             jab, punch, lightKick, heavyKick, hurt1, hurt2;
     public int[][][][] comboSprites;
+
     Method[] method = new Method[]{
         this::combo1,
         this::combo2,
@@ -167,15 +168,17 @@ abstract public class Fighter {
         this.width = (int) (frame[index][0][2] * (scale * direction));
         this.height = (int) (frame[index][0][3] * scale);
         int groundGap = (int) (frame[index][0][4] * Constant.GROUNDGAP);
-         this.fighterX = (int) (camera/2.5) + (x-width/2);
-         this.fighterY = y-(height+groundGap);
+         this.offset_x = camera + (x-width/2);
+         this.offset_y = y-(height+groundGap);
+
+         this.fighterX = offset_x + width/2;
 
         g2d.drawImage(fighter.getSubimage(
                 frame[index][0][0],
                 frame[index][0][1],
                 frame[index][0][2],
                 frame[index][0][3]
-        ), fighterX ,fighterY , width, height, null);
+        ), offset_x ,offset_y , width, height, null);
 
         setPushBox(g2d, index, frame);
         drawDimension(g2d, frame, index);
@@ -187,23 +190,23 @@ abstract public class Fighter {
         g2d.setColor(Color.green);
         g2d.drawRect(x_box, y_box, box_width, box_height);
         g2d.setColor(Color.BLUE);
-        g2d.fillRect(x, y, 5,5);
+        g2d.fillRect(fighterX, y, 5,5);
     }
 
     public void drawDimension(Graphics2D g2d, int[][][] frame, int index){
-        int x_box = (int) (direction>0? fighterX : fighterX-frame[index][0][2]*scale);
+        int x_box = (int) (direction>0? offset_x : offset_x-frame[index][0][2]*scale);
         int box_width = (int) (frame[index][0][2] * scale);
         int box_height = (int) (frame[index][0][3] * scale);
 
-        if ((((int) (camera/2.5) + x) + (box_width/2)) >= panel.getWidth()){
+        if ((camera + x + (box_width/2)) >= panel.getWidth()){
             x -= state==STATE.JUMP_FORWARD || state==STATE.JUMP_BACKWARD? (int) (vx + 1.7) : vx;
         }
-        if ((((int) (camera/2.5) + x) - (box_width/2)) <= 0){
+        if ((camera + x - (box_width/2)) <= 0){
             x += state==STATE.JUMP_FORWARD || state==STATE.JUMP_BACKWARD? (int) (vx + 1.7) : vx;
         }
 
         g2d.setColor(Color.magenta);
-       g2d.drawRect(x_box, fighterY, box_width, box_height);
+       g2d.drawRect(x_box, offset_y, box_width, box_height);
     }
 
 
@@ -213,7 +216,7 @@ abstract public class Fighter {
     }
     public void setPushBox(Graphics2D g2d, int index, int[][][] frame){
         int groundGap = (int) (frame[index][0][4] * Constant.GROUNDGAP);
-        int x_box = (int) (camera/2.5) + (int) (direction>0? x-frame[index][1][0] * scale :
+        int x_box = camera + (int) (direction>0? x-frame[index][1][0] * scale :
                         x-((frame[index][1][2] * scale) - (frame[index][1][0] * scale)));
         int y_box = (int) (y-(frame[index][1][1] * scale + groundGap));
         int box_width = (int) (frame[index][1][2] * scale);
@@ -224,7 +227,7 @@ abstract public class Fighter {
     }
     public void setHitBox(Graphics2D g2d, int index, int[][][] frame){
         int groundGap = (int) (frame[index][0][4] * Constant.GROUNDGAP);
-        int x_box = (int) (camera/2.5) + (int) (direction>0? x-frame[index][2][0] * scale :
+        int x_box = camera + (int) (direction>0? x-frame[index][2][0] * scale :
                         x-((frame[index][2][2]*scale) - (frame[index][2][0]*scale)));
         int y_box = (int) (y-(frame[index][2][1] * scale + groundGap));
         int box_width = (int) (frame[index][2][2] * scale);

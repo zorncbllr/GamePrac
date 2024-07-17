@@ -13,7 +13,7 @@ public class Backdrop {
     private Panel panel;
     private float scale;
     private Fighter[] fighters;
-    int backdropX, tick = 0, imageX = 14, imageY = 1, vx = 10, height, width, prev_backdropX;
+    int backdropX, tick = 0, imageX = 14, imageY = 1, vx = 10, height, width;
     public BufferedImage backdrop;
 
     public Backdrop(String path, Panel panel){
@@ -28,9 +28,7 @@ public class Backdrop {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        this.backdropX = -(int)(backdrop.getWidth()/1.5 - panel.getWidth());
-        prev_backdropX = backdropX;
-        System.out.println(backdropX);
+        this.backdropX = (int) (- width/3.5);
     }
 
     public void drawBackdrop(Graphics2D g2d){
@@ -52,21 +50,26 @@ public class Backdrop {
         );
     }
 
-    int prevX = 0;
 
     public void handleCamera(Graphics2D g2d){
 
         for (Fighter ftr: fighters){
-            ftr.camera = panel.getWidth() - Math.abs(backdropX);
+            ftr.camera = (int) ((panel.getWidth() - Math.abs(backdropX)));
         }
 
-        int dif = fighters[0].x - prevX;
-        boolean atBackdropEnd = backdropX <= 0 || backdropX >= width - panel.getWidth();
+        int off_set = 10;
+        boolean scroll_left = (fighters[0].fighterX <= 120 || fighters[1].fighterX <= 120);
+        boolean scroll_right = fighters[0].fighterX >= (panel.getWidth()-120) || fighters[1].fighterX >= (panel.getWidth()-120);
+        boolean at_scroll_end = Math.abs(backdropX) > (width - panel.getWidth() - off_set);
+        boolean at_scroll_start = backdropX > -off_set;
 
-        if (Math.abs(dif) > 0){
-            prev_backdropX = backdropX;
-            backdropX = prev_backdropX - fighters[0].x;
-            prevX = fighters[0].x;
+        if (scroll_left && !at_scroll_start) {
+            backdropX += Constant.vx;
         }
+
+        if (scroll_right && !at_scroll_end) {
+            backdropX -= Constant.vx;
+        }
+
     }
 }
