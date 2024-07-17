@@ -28,7 +28,7 @@ public class Backdrop {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        this.backdropX = (int) (- width/3.5);
+        this.backdropX = - 640;
     }
 
     public void drawBackdrop(Graphics2D g2d){
@@ -49,7 +49,6 @@ public class Backdrop {
                height , null
         );
     }
-
 
     public void handleCamera(Graphics2D g2d){
 

@@ -16,8 +16,8 @@ public class Panel extends JPanel {
     public Graphics2D g2d;
     Panel(){
         this.fighter = new Fighter[] {
-                new Terry(this, 200),
-                new K(this, 800)
+                new Terry(this, -200),
+                new K(this, 480)
         };
         inputHandler2 = new InputHandler(fighter[1]);
         inputHandler1 = new InputHandler(fighter[0]);
